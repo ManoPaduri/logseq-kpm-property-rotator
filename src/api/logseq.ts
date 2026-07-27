@@ -100,25 +100,33 @@ export async function focusPropertyLine(uuid: string, property: string): Promise
  */
 export async function getCurrentBlock(): Promise<BlockInfo | null> {
   try {
+    console.log("[PR API] getCurrentBlock: calling logseq.Editor.getCurrentBlock");
     let block = await logseq.Editor.getCurrentBlock();
+    console.log("[PR API] getCurrentBlock: getCurrentBlock returned:", block ? block.uuid : null);
 
     if (!block) {
+      console.log("[PR API] getCurrentBlock: trying getSelectedBlocks");
       const selected = await logseq.Editor.getSelectedBlocks();
+      console.log("[PR API] getCurrentBlock: getSelectedBlocks returned:", selected?.length ?? 0, "blocks");
       if (selected && selected.length > 0) {
         block = selected[0];
       }
     }
 
-    if (!block) return null;
+    if (!block) {
+      console.log("[PR API] getCurrentBlock: both methods returned null - no block in edit mode");
+      return null;
+    }
 
     const freshBlock = await logseq.Editor.getBlock(block.uuid, { includeChildren: false });
+    console.log("[PR API] getCurrentBlock: freshBlock content length:", freshBlock?.content?.length ?? 0, "properties:", JSON.stringify(freshBlock?.properties ?? {}));
     return {
       uuid: block.uuid,
       content: (freshBlock?.content ?? block.content) ?? '',
       properties: ((freshBlock?.properties ?? block.properties) as Record<string, string>) || {}
     };
   } catch (error) {
-    console.error("[Property Rotator API] getCurrentBlock error:", error);
+    console.error("[PR API] getCurrentBlock THREW:", error);
     return null;
   }
 }
@@ -156,10 +164,12 @@ export async function setBlockProperty(
   value: string
 ): Promise<boolean> {
   try {
+    console.log("[PR API] setBlockProperty:", property, "=", value, "on block:", blockUuid);
     await logseq.Editor.upsertBlockProperty(blockUuid, property, value);
+    console.log("[PR API] setBlockProperty: success");
     return true;
   } catch (error) {
-    console.error(`[Property Rotator API] setBlockProperty error (${property}):`, error);
+    console.error("[PR API] setBlockProperty THREW:", property, error);
     return false;
   }
 }

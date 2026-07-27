@@ -31,6 +31,7 @@ export function registerShortcuts(settings: PluginSettings = defaultSettings): v
 
   const mainShortcut = (settings.shortcuts?.mainShortcut || "").trim() || "ctrl+shift+j";
   const subShortcut = (settings.shortcuts?.subShortcut || "").trim() || "ctrl+shift+k";
+  console.log("[PR SHORTCUTS] registerShortcuts called - main:", mainShortcut, "sub:", subShortcut);
 
   // Main rotation shortcut
   logseq.App.registerCommandPalette(
@@ -58,17 +59,18 @@ export function registerShortcuts(settings: PluginSettings = defaultSettings): v
  * @param useSubRotation - Whether to use sub-rotation
  */
 export async function handleRotation(useSubRotation: boolean): Promise<void> {
-  console.log("[Property Rotator] handleRotation called, useSubRotation:", useSubRotation);
+  console.log("[PR] handleRotation called, useSubRotation:", useSubRotation);
   const block = await getCurrentBlock();
-  console.log("[Property Rotator] getCurrentBlock result:", block);
+  console.log("[PR] getCurrentBlock result:", JSON.stringify(block ? { uuid: block.uuid, content: block.content?.substring(0, 80), propKeys: Object.keys(block.properties || {}) } : null));
 
   if (!block) {
-    console.log("[Property Rotator] No block found, showing error");
+    console.log("[PR] No block found - is cursor inside a block in edit mode?");
     logseq.UI.showMsg("No current block found", "error");
     return;
   }
 
   const rotations = currentSettings?.rotations || defaultSettings.rotations;
+  console.log("[PR] rotations count:", rotations.length, "prefix:", (currentSettings?.propertyPrefix ?? "").trim() || "(none)");
 
   // Build prefixed property name helper
   const rawPrefix = (currentSettings?.propertyPrefix ?? "").trim();
@@ -80,6 +82,7 @@ export async function handleRotation(useSubRotation: boolean): Promise<void> {
 
   // Detect which property the cursor is on — prioritise that one
   const cursorProp = await getCursorProperty();
+  console.log("[PR] cursorProp:", cursorProp);
 
   // If cursor is on a configured secondary property, rotate only that one
   if (cursorProp) {
@@ -104,10 +107,12 @@ export async function handleRotation(useSubRotation: boolean): Promise<void> {
     }
   }
 
+  console.log("[PR] scanning rotations for existing property...");
   for (const rotation of rotations) {
     const effectiveProp = prefixProp(rotation.property);
     const raw = block.properties[lookupKey(rotation.property)];
     const currentValue = raw !== undefined && raw !== null ? String(raw) : null;
+    console.log("[PR] rotation:", rotation.property, "effectiveProp:", effectiveProp, "lookupKey:", lookupKey(rotation.property), "raw:", raw, "currentValue:", currentValue);
 
     if (currentValue !== null) {
       const newValue = rotateProperty(currentValue, rotation, useSubRotation);
@@ -127,7 +132,9 @@ export async function handleRotation(useSubRotation: boolean): Promise<void> {
   }
 
   // No existing property found — add all configured properties with their first terms
+  console.log("[PR] no existing property found - will add first terms");
   const validRotations = rotations.filter(r => r.terms.length > 0);
+  console.log("[PR] validRotations:", validRotations.length);
   if (validRotations.length === 0) {
     logseq.UI.showMsg("No rotations configured", "warning");
     return;

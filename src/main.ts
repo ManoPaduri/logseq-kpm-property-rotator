@@ -50,24 +50,31 @@ function loadSettings(): PluginSettings {
  * Called when Logseq loads the plugin
  */
 async function main() {
+  console.log("[PR INIT] main() started");
   try {
     // Register the structured settings schema (native Logseq settings UI)
     registerSettings();
+    console.log("[PR INIT] registerSettings done");
 
     // Load user settings from the schema
     const settings = loadSettings();
+    console.log("[PR INIT] loadSettings done, rotations:", settings?.rotations?.length, "shortcuts:", settings?.shortcuts);
 
     // Force-reset shortcuts if they still have the old stale defaults
     const savedMain = String(logseq.settings?.mainShortcut ?? "");
     const savedSub = String(logseq.settings?.subShortcut ?? "");
+    console.log("[PR INIT] saved shortcuts from settings - main:", savedMain, "sub:", savedSub);
     const staleValues = ["mod+shift+alt+enter", "mod+shift+enter", "mod+shift+r", "mod+shift+return", "mod+shift+1", "mod+shift+2", "mod+opt+[", "mod+opt+<", "mod+shift+o", "mod+shift+k"];
     if (staleValues.includes(savedMain) || staleValues.includes(savedSub)) {
+      console.log("[PR INIT] resetting stale shortcuts");
       await logseq.updateSettings({ mainShortcut: "ctrl+shift+j", subShortcut: "ctrl+shift+k" });
       settings.shortcuts = { mainShortcut: "ctrl+shift+j", subShortcut: "ctrl+shift+k" };
     }
     // Sync UI fields based on active profile or defaults
     const activeProfile = String(logseq.settings?.profile ?? "custom").trim().toLowerCase();
+    console.log("[PR INIT] activeProfile:", activeProfile);
     if (activeProfile !== "custom" && profiles[activeProfile]) {
+      console.log("[PR INIT] syncing profile to UI:", activeProfile);
       await syncProfileToUI(activeProfile);
     } else {
       const d = defaultSettings.rotations[0];
@@ -87,8 +94,10 @@ async function main() {
       await logseq.updateSettings(subListUpdate);
     }
 
+    console.log("[PR INIT] calling registerShortcuts with main:", settings?.shortcuts?.mainShortcut, "sub:", settings?.shortcuts?.subShortcut);
     // Register keyboard shortcuts with live settings
     registerShortcuts(settings);
+    console.log("[PR INIT] registerShortcuts done");
 
     // Track current shortcuts to avoid unnecessary re-registration
     let currentMainShortcut = (settings.shortcuts?.mainShortcut || "").trim() || "ctrl+shift+j";
@@ -102,7 +111,7 @@ async function main() {
     // Block onSettingsChanged during entire init to prevent re-registration from startup updateSettings calls
     let isSyncing = true;
     // Allow settings changes after a short delay so init updateSettings calls are ignored
-    setTimeout(() => { isSyncing = false; }, 2000);
+    setTimeout(() => { console.log("[PR INIT] isSyncing unlocked - plugin fully ready"); isSyncing = false; }, 2000);
 
     // Apply settings changes live, without requiring a plugin reload
     logseq.onSettingsChanged(async (newSettings: any) => {
@@ -138,8 +147,9 @@ async function main() {
       }
 
     });
+    console.log("[PR INIT] main() completed successfully");
   } catch (error) {
-    console.error("Error initializing Property Rotator plugin:", error);
+    console.error("[PR INIT] FATAL ERROR initializing Property Rotator plugin:", error);
     logseq.UI.showMsg("Error initializing Property Rotator plugin", "error");
   }
 }
