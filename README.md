@@ -3,9 +3,11 @@
 ![Beta](https://img.shields.io/badge/status-beta-orange?style=flat)
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/manu4linux?label=Sponsor&logo=GitHub&style=flat)](https://github.com/sponsors/manu4linux)
 
-> ⚠️ **Beta release** — core features are working and tested, but rough edges may exist. Feedback and bug reports welcome via [GitHub Issues](https://github.com/ManoPaduri/logseq-kpm-property-rotator/issues).
+> ⚠️ **Beta release** : core features are working and tested, but rough edges may exist. 
+> ⚠️ THIS VERSION DO NOT WORK as expected yet (trying to fix them).
+>Feedback and bug reports welcome via [GitHub Issues](https://github.com/ManoPaduri/logseq-kpm-property-rotator/issues).
 
-> 🛒 **Not yet in the Logseq marketplace** — install manually for now (see [Setup](#setup) below).
+> 🛒 **Not yet in the Logseq marketplace** :  install manually for now (see [Setup](#setup) below).
 
 Rotate Logseq block properties through a list of values using keyboard shortcuts. Supports quick profiles (GTD / PARA), property prefixes, cursor-aware rotation, and sub-term cycling.
 
@@ -34,7 +36,7 @@ Open plugin Settings → **Quick Profile** to select a preset:
 | **gtd** | `status`: later → todo → now → doing → done → canceled; `location`: home → work |
 | **para** | `status`: project → area → resource → archive; `location`: home → work |
 
-> **Note:** After switching profiles, field values in settings do not update instantly — close and re-open settings to see them reflected. The rotation logic switches immediately.
+> **Note:** After switching profiles, field values in settings do not update instantly ,  close and re-open settings to see them reflected. The rotation logic switches immediately.
 
 ---
 
@@ -56,7 +58,7 @@ A short prefix (2–4 chars) is prepended to every property name with a dash.
 
 ## Cursor-Aware Rotation
 
-When the cursor is **on a specific property line** inside a block, the shortcut rotates **only that first property1** — regardless of which property cursor is on.
+When the cursor is **on a specific property line** inside a block, the shortcut rotates **only that first property1** ,  regardless of which property cursor is on.
 
 ```
   my-status:: doing       ← cursor here → Ctrl+Shift+J rotates status
@@ -76,7 +78,7 @@ After every rotation, the cursor is placed right after `::` on the updated prope
 
 ## Default Rotations (`custom` profile)
 
-**Property 1 — `my-status`:**
+**Property 1 ,  `my-status`:**
 
 | Main term | Sub-list (`Ctrl+Shift+K`) |
 |---|---|
@@ -87,7 +89,7 @@ After every rotation, the cursor is placed right after `::` on the updated prope
 | `done` | *(none)* |
 | `canceled` | `optional`, `impossible` |
 
-**Property 2 — `my-location`:** `home` → `work` → `home` …
+**Property 2 ,  `my-location`:** `home` → `work` → `home` …
 
 ---
 
@@ -129,7 +131,7 @@ Wraps: `now` → `doing` → `done` → `canceled` → `later` → …
 
 ---
 
-### 3. Both properties — cursor selects which to rotate
+### 3. Both properties ,  cursor selects which to rotate
 
 ```
 - Task
@@ -147,7 +149,7 @@ Wraps: `now` → `doing` → `done` → `canceled` → `later` → …
 
 ---
 
-### 4. Sub-term present — main rotation clears it
+### 4. Sub-term present ,  main rotation clears it
 
 ```
 - Task
@@ -179,7 +181,7 @@ Wraps: `now` → `doing` → `done` → `canceled` → `later` → …
 
 ---
 
-### 6. Unrecognised properties — ignored
+### 6. Unrecognised properties ,  ignored
 
 ```
 - Task
@@ -240,15 +242,15 @@ Then in Logseq: **Settings → Advanced → Developer mode → Load unpacked plu
 
 ## Support
 
-This plugin is free and built in personal time — no ads, no telemetry, no paywalls.
+This plugin is free and built in personal time ,  no ads, no telemetry, no paywalls.
 
 If it saves you time in your daily Logseq pkm workflow, a small contribution goes a long way:
 
-- **It keeps the plugin maintained** — bug fixes, compatibility updates as Logseq evolves, and new features based on real user feedback.
-- **It funds focused work** — even a small amount means I can carve out dedicated time rather than squeezing this in between everything else.
-- **It creates a direct connection** — supporters who contribute often share how they use the plugin, which directly shapes what gets built next.
+- **It keeps the plugin maintained** :  bug fixes, compatibility updates as Logseq evolves, and new features based on real user feedback.
+- **It funds focused work** :  even a small amount means I can carve out dedicated time rather than squeezing this in between everything else.
+- **It creates a direct connection** :  supporters who contribute often share how they use the plugin, which directly shapes what gets built next.
 
-> Every contribution, however small, signals that this work matters — and that's what keeps it going.
+> Every contribution, however small, signals that this work matters , and that's what keeps it going.
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/manu4linux?label=Sponsor&logo=GitHub&style=flat)](https://github.com/sponsors/manu4linux)
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/manu4linux)
@@ -259,7 +261,7 @@ If it saves you time in your daily Logseq pkm workflow, a small contribution goe
 
 ## What's Next
 
-> 💡 **Side note:** This plugin is a foundation. Properties become much more powerful when combined with Logseq's query system or namespace-based file organisation — giving you at-a-glance views and structure without extra effort.
+> 💡 **Side note:** This plugin is a foundation. Properties become much more powerful when combined with Logseq's query system or namespace-based file organisation , giving you at-a-glance views and structure without extra effort.
 >
 > The next area of focus may be making that organisation effortless: think query templates that surface your GTD/PARA properties automatically, or namespace conventions that keep everything findable with zero maintenance.
 >
