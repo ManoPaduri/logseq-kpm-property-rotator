@@ -1,6 +1,6 @@
 {
   "name": "logseq-property-rotator",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Rotate Logseq block properties through configurable term lists with GTD/PARA profiles, prefix support, and cursor-aware rotation.",
   "type": "module",
   "main": "dist/index.html",
@@ -17,9 +17,18 @@
   },
   "jest": {
     "testEnvironment": "node",
-    "testMatch": ["**/tests/**/*.test.ts"],
+    "testMatch": [
+      "**/tests/**/*.test.ts"
+    ],
     "transform": {
-      "^.+\\.tsx?$": ["ts-jest", { "tsconfig": { "module": "commonjs" } }]
+      "^.+\\.tsx?$": [
+        "ts-jest",
+        {
+          "tsconfig": {
+            "module": "commonjs"
+          }
+        }
+      ]
     },
     "collectCoverageFrom": [
       "src/**/*.ts",
