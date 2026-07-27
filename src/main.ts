@@ -98,7 +98,13 @@ async function main() {
     registerToolbarButton();
 
     // Use raw keydown to trigger rotation - works regardless of editor state
-    top?.document.addEventListener("keydown", async (e: KeyboardEvent) => {
+    // top.document is cross-origin in some Logseq builds — fall back safely
+    const targetDoc = (() => {
+      try { if (top?.document) return top.document; } catch { /* cross-origin blocked */ }
+      try { if (window.parent?.document) return window.parent.document; } catch { /* blocked */ }
+      return document;
+    })();
+    targetDoc.addEventListener("keydown", async (e: KeyboardEvent) => {
       const main = (settings.shortcuts?.mainShortcut || "").trim() || "ctrl+shift+j";
       const sub = (settings.shortcuts?.subShortcut || "").trim() || "ctrl+shift+k";
 

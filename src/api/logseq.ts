@@ -14,9 +14,11 @@ import { BlockInfo } from '../types';
  */
 export async function getCursorProperty(): Promise<string | null> {
   try {
-    // Try every known Logseq editor element type
-    const doc = top?.document;
-    if (!doc) return null;
+    // top.document may be cross-origin blocked — fall back safely
+    let doc: Document | null = null;
+    try { doc = top?.document ?? null; } catch { /* cross-origin blocked */ }
+    if (!doc) { try { doc = window.parent?.document ?? null; } catch { /* blocked */ } }
+    if (!doc) doc = document;
 
     const el = (
       doc.activeElement as HTMLElement | null
@@ -33,7 +35,10 @@ export async function getCursorProperty(): Promise<string | null> {
       content = await logseq.Editor.getEditingBlockContent();
 
       // Try to read cursor offset from selection in contenteditable
-      const sel = top?.getSelection();
+      let sel: Selection | null = null;
+      try { sel = top?.getSelection() ?? null; } catch { /* cross-origin blocked */ }
+      if (!sel) { try { sel = window.parent?.getSelection() ?? null; } catch { /* blocked */ } }
+      if (!sel) sel = window.getSelection();
       if (sel && sel.rangeCount > 0) {
         const range = sel.getRangeAt(0);
         const preRange = range.cloneRange();
