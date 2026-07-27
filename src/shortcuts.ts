@@ -33,25 +33,81 @@ export function registerShortcuts(settings: PluginSettings = defaultSettings): v
   const subShortcut = (settings.shortcuts?.subShortcut || "").trim() || "ctrl+shift+k";
   console.log("[PR SHORTCUTS] registerShortcuts called - main:", mainShortcut, "sub:", subShortcut);
 
-  // Main rotation shortcut
+  // Register via command palette (block-editing-only fires when typing in a block)
+  // NOTE: requires full Logseq restart to activate the keybinding
   logseq.App.registerCommandPalette(
     {
       key: "property-rotator/main",
       label: "Rotate Property",
-      keybinding: { binding: mainShortcut, mode: "global" }
+      keybinding: { binding: mainShortcut, mode: "editing" }
     },
-    async () => { console.log("[Property Rotator] main shortcut triggered"); await handleRotation(false); }
+    async () => { console.log("[Property Rotator] main palette/shortcut triggered"); await handleRotation(false); }
   );
 
-  // Sub-rotation shortcut
   logseq.App.registerCommandPalette(
     {
       key: "property-rotator/sub",
       label: "Sub-Rotate Property",
-      keybinding: { binding: subShortcut, mode: "global" }
+      keybinding: { binding: subShortcut, mode: "editing" }
     },
-    async () => { console.log("[Property Rotator] sub shortcut triggered"); await handleRotation(true); }
+    async () => { console.log("[Property Rotator] sub palette/shortcut triggered"); await handleRotation(true); }
   );
+
+  // Fallback: raw keydown on top.document (works when Logseq shortcut system blocks the plugin)
+  const targetDoc = (() => {
+    try { if (top?.document) { console.log("[PR SHORTCUTS] attaching keydown to top.document"); return top.document; } }
+    catch { console.log("[PR SHORTCUTS] top.document blocked, trying window.parent"); }
+    try { if (window.parent?.document) return window.parent.document; }
+    catch { console.log("[PR SHORTCUTS] window.parent.document blocked, using own document"); }
+    return document;
+  })();
+
+  console.log("[PR SHORTCUTS] keydown listener target:", targetDoc === top?.document ? "top.document" : targetDoc === window.parent?.document ? "window.parent.document" : "own document");
+
+  targetDoc.addEventListener("keydown", async (e: KeyboardEvent) => {
+    const ctrl = e.ctrlKey || e.metaKey;
+    const shift = e.shiftKey;
+    // Log EVERY keydown so we know the listener fires at all
+    console.log("[PR KEYDOWN] FIRED key:", JSON.stringify(e.key), "ctrl:", ctrl, "shift:", shift, "alt:", e.altKey, "target:", (e.target as HTMLElement)?.tagName, (e.target as HTMLElement)?.className?.substring?.(0,40));
+
+    const main = (currentSettings.shortcuts?.mainShortcut || "ctrl+shift+j").trim().toLowerCase();
+    const sub = (currentSettings.shortcuts?.subShortcut || "ctrl+shift+k").trim().toLowerCase();
+    console.log("[PR KEYDOWN] comparing against main:", main, "sub:", sub);
+
+    const matchesShortcut = (shortcut: string, ev: KeyboardEvent) => {
+      const parts = shortcut.split("+");
+      const needCtrl = parts.includes("ctrl") || parts.includes("mod");
+      const needMeta = parts.includes("meta");
+      const needShift = parts.includes("shift");
+      const needAlt = parts.includes("alt");
+      const keyPart = parts[parts.length - 1];
+      const result = (ev.ctrlKey || ev.metaKey) === (needCtrl || needMeta) &&
+             ev.shiftKey === needShift &&
+             ev.altKey === needAlt &&
+             ev.key.toLowerCase() === keyPart;
+      console.log("[PR KEYDOWN] matchesShortcut('", shortcut, "') needCtrl:", needCtrl, "needShift:", needShift, "keyPart:", keyPart, "→", result);
+      return result;
+    };
+
+    const mainMatch = matchesShortcut(main, e);
+    const subMatch = !mainMatch && matchesShortcut(sub, e);
+
+    if (mainMatch) {
+      console.log("[PR KEYDOWN] ✓ main shortcut matched! calling handleRotation(false)");
+      e.preventDefault();
+      e.stopPropagation();
+      await handleRotation(false);
+    } else if (subMatch) {
+      console.log("[PR KEYDOWN] ✓ sub shortcut matched! calling handleRotation(true)");
+      e.preventDefault();
+      e.stopPropagation();
+      await handleRotation(true);
+    } else {
+      console.log("[PR KEYDOWN] no shortcut match for key:", JSON.stringify(e.key));
+    }
+  }, true);
+
+  console.log("[PR SHORTCUTS] keydown listener attached successfully");
 }
 
 /**
