@@ -38,7 +38,7 @@ export function registerShortcuts(settings: PluginSettings = defaultSettings): v
     {
       key: "property-rotator/main",
       label: "Rotate Property",
-      keybinding: { binding: mainShortcut, mode: "editing" }
+      keybinding: { binding: mainShortcut, mode: "global" }
     },
     async () => { console.log("[Property Rotator] main shortcut triggered"); await handleRotation(false); }
   );
@@ -48,7 +48,7 @@ export function registerShortcuts(settings: PluginSettings = defaultSettings): v
     {
       key: "property-rotator/sub",
       label: "Sub-Rotate Property",
-      keybinding: { binding: subShortcut, mode: "editing" }
+      keybinding: { binding: subShortcut, mode: "global" }
     },
     async () => { console.log("[Property Rotator] sub shortcut triggered"); await handleRotation(true); }
   );
