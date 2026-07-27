@@ -95,21 +95,21 @@ export function registerSettings(): void {
       type: "heading",
       default: null,
       title: `Rotation ${p}`,
-      description: `Property #${p} to rotate. Leave the name/terms blank to disable this slot.`
+      description: `A block property and the list of values it cycles through. Leave the fields below blank to turn this rotation off.`
     });
     schema.push({
       key: `property${p}`,
       type: "string",
       default: slotDefault ? slotDefault.property : "",
-      title: `Property ${p} name`,
-      description: "The block property to rotate, e.g. status or type."
+      title: `Rotation ${p} — Property Name`,
+      description: "The name of the block property this rotation changes, e.g. status or priority."
     });
     schema.push({
       key: `terms${p}`,
       type: "string",
       default: slotDefault ? slotDefault.terms.join(", ") : "",
-      title: `Property ${p} terms`,
-      description: "Comma-separated rotation terms (Option+Enter). Any number of terms."
+      title: `Rotation ${p} — Values`,
+      description: "The list of values to cycle through, in order. Separate with commas, e.g. todo, doing, done."
     });
   }
 
@@ -118,21 +118,22 @@ export function registerSettings(): void {
     key: `subListsHeading`,
     type: "heading",
     default: null,
-    title: `Rotation 1 Sub-lists`,
-    description: `Sub-rotation terms for Rotation 1. Each sub-list applies to the corresponding term in Rotation 1.`
+    title: `Rotation 1 — Sub-values (optional)`,
+    description: `Optional second-level values for each value in Rotation 1. Press the sub-rotation shortcut to cycle them; they appear after a slash, e.g. "todo/high".`
   });
 
   // Create sub-list fields for property1
   for (let m = 1; m <= MAX_SUBLISTS; m++) {
     const term = defTerms[m - 1];
     const defSub = term ? (defSubs[term] || []).join(", ") : "";
-    const termLabel = term ? `"${term}"` : `term #${m}`;
     schema.push({
       key: `property1subList${m}`,
       type: "string",
       default: defSub,
-      title: `Sub-list ${m}: ${term || `(term ${m})`}`,
-      description: `Sub-rotation terms for ${termLabel} (Ctrl+Shift+K). Comma-separated. Maps to position ${m} in the terms list.`
+      title: term ? `Sub-values for "${term}"` : `Sub-values (value ${m})`,
+      description: term
+        ? `Values cycled when Rotation 1 is set to "${term}". Separate with commas, e.g. high, medium, low.`
+        : `Values cycled for value #${m} of Rotation 1. Separate with commas.`
     });
   }
 

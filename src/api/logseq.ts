@@ -14,55 +14,32 @@ import { BlockInfo } from '../types';
  */
 export async function getCursorProperty(): Promise<string | null> {
   try {
-    // top.document may be cross-origin blocked — fall back safely
-    let doc: Document | null = null;
-    try { doc = top?.document ?? null; } catch { /* cross-origin blocked */ }
-    if (!doc) { try { doc = window.parent?.document ?? null; } catch { /* blocked */ } }
-    if (!doc) doc = document;
-
-    const el = (
-      doc.activeElement as HTMLElement | null
-    );
-    let content: string | null = null;
-    let cursorPos: number | null = null;
-
-    if (el && (el.tagName === "TEXTAREA" || el.tagName === "INPUT")) {
-      const inp = el as HTMLTextAreaElement;
-      content = inp.value;
-      cursorPos = inp.selectionStart;
-    } else {
-      // CodeMirror / contenteditable fallback — use Logseq API for content
-      content = await logseq.Editor.getEditingBlockContent();
-
-      // Try to read cursor offset from selection in contenteditable
-      let sel: Selection | null = null;
-      try { sel = top?.getSelection() ?? null; } catch { /* cross-origin blocked */ }
-      if (!sel) { try { sel = window.parent?.getSelection() ?? null; } catch { /* blocked */ } }
-      if (!sel) sel = window.getSelection();
-      if (sel && sel.rangeCount > 0) {
-        const range = sel.getRangeAt(0);
-        const preRange = range.cloneRange();
-        preRange.selectNodeContents(range.startContainer.parentElement ?? doc.body);
-        preRange.setEnd(range.startContainer, range.startOffset);
-        cursorPos = preRange.toString().length;
-      }
+    // Use Logseq's official APIs — cross-origin safe, works under the global shortcut.
+    const content = await logseq.Editor.getEditingBlockContent();
+    if (!content) {
+      console.log("[PR API] getCursorProperty: no editing content (not in edit mode)");
+      return null;
     }
 
-    if (!content) return null;
+    const cursor = await logseq.Editor.getEditingCursorPosition();
+    console.log("[PR API] getCursorProperty: cursor pos:", cursor?.pos ?? null, "contentLen:", content.length);
+    if (!cursor || typeof cursor.pos !== "number") return null;
 
-    // If we couldn't get cursor position, return null (fall back to config order)
-    if (cursorPos === null) return null;
-
+    const cursorPos = cursor.pos;
     const textBeforeCursor = content.substring(0, cursorPos);
     const lineIndex = textBeforeCursor.split("\n").length - 1;
     const lines = content.split("\n");
     const cursorLine = lines[lineIndex] ?? "";
+    console.log("[PR API] getCursorProperty: lineIndex:", lineIndex, "cursorLine:", JSON.stringify(cursorLine));
 
     const match = cursorLine.match(/^([a-zA-Z0-9_-]+)::/);
-    if (match) return match[1].toLowerCase();
+    if (match) {
+      console.log("[PR API] getCursorProperty: detected property:", match[1].toLowerCase());
+      return match[1].toLowerCase();
+    }
     return null;
   } catch (error) {
-    console.error("[Property Rotator API] getCursorProperty error:", error);
+    console.error("[PR API] getCursorProperty THREW:", error);
     return null;
   }
 }

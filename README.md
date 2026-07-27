@@ -19,8 +19,8 @@ Rotate Logseq block properties through a list of values using keyboard shortcuts
 
 | Action | Default Key |
 |---|---|
-| Main rotation | `Ctrl+Shift+J` |
-| Sub-rotation | `Ctrl+Shift+K` |
+| Main rotation | `Cmd/Ctrl+Shift+,` |
+| Sub-rotation | `Cmd/Ctrl+Shift+.` |
 
 Both shortcuts can be changed in plugin Settings.
 
@@ -61,13 +61,13 @@ A short prefix (2–4 chars) is prepended to every property name with a dash.
 When the cursor is **on a specific property line** inside a block, the shortcut rotates **only that first property1** ,  regardless of which property cursor is on.
 
 ```
-  my-status:: doing       ← cursor here → Ctrl+Shift+J rotates status
+  my-status:: doing       ← cursor here → Cmd/Ctrl+Shift+, rotates status
   my-location:: home
 ```
 
 ```
   my-status:: doing
-  my-location:: home      ← cursor here → Ctrl+Shift+J rotates location
+  my-location:: home      ← cursor here → Cmd/Ctrl+Shift+, rotates location
 ```
 
 If the cursor is not on a recognised property line, the first configured property1 is rotated as normal.
@@ -80,7 +80,7 @@ After every rotation, the cursor is placed right after `::` on the updated prope
 
 **Property 1 ,  `my-status`:**
 
-| Main term | Sub-list (`Ctrl+Shift+K`) |
+| Main term | Sub-list (`Cmd/Ctrl+Shift+.`) |
 |---|---|
 | `later` | `scheduled`, `waiting` |
 | `todo` | `high`, `medium`, `low` |
@@ -104,7 +104,7 @@ After every rotation, the cursor is placed right after `::` on the updated prope
 - Buy groceries
 ```
 
-**`Ctrl+Shift+J`** → adds first property with first term:
+**`Cmd/Ctrl+Shift+,`** → adds first property with first term:
 
 ```
 - Buy groceries
@@ -120,7 +120,7 @@ After every rotation, the cursor is placed right after `::` on the updated prope
   my-status:: todo
 ```
 
-**`Ctrl+Shift+J`** → advances to next term:
+**`Cmd/Ctrl+Shift+,`** → advances to next term:
 
 ```
 - Buy groceries
@@ -139,7 +139,7 @@ Wraps: `now` → `doing` → `done` → `canceled` → `later` → …
   my-location:: home    ← cursor on this line
 ```
 
-**`Ctrl+Shift+J`** → only `my-location` rotates:
+**`Cmd/Ctrl+Shift+,`** → only `my-location` rotates:
 
 ```
 - Task
@@ -156,7 +156,7 @@ Wraps: `now` → `doing` → `done` → `canceled` → `later` → …
   my-status:: todo/high
 ```
 
-**`Ctrl+Shift+J`** → sub-term stripped, main advances:
+**`Cmd/Ctrl+Shift+,`** → sub-term stripped, main advances:
 
 ```
 - Task
@@ -172,7 +172,7 @@ Wraps: `now` → `doing` → `done` → `canceled` → `later` → …
   my-status::
 ```
 
-**`Ctrl+Shift+J`** → sets first term:
+**`Cmd/Ctrl+Shift+,`** → sets first term:
 
 ```
 - Task
@@ -188,7 +188,7 @@ Wraps: `now` → `doing` → `done` → `canceled` → `later` → …
   priority:: urgent
 ```
 
-**`Ctrl+Shift+J`** → unrecognised properties untouched, first rotation property added:
+**`Cmd/Ctrl+Shift+,`** → unrecognised properties untouched, first rotation property added:
 
 ```
 - Task
@@ -198,7 +198,7 @@ Wraps: `now` → `doing` → `done` → `canceled` → `later` → …
 
 ---
 
-## Sub-rotation (`Ctrl+Shift+K`)
+## Sub-rotation (`Cmd/Ctrl+Shift+.`)
 
 Cycles a sub-term **alongside** the current main term. Main term is unchanged.
 
@@ -209,7 +209,7 @@ my-status:: todo/medium   →  my-status:: todo/low
 my-status:: todo/low      →  my-status:: todo/high   (wraps)
 ```
 
-Sub-terms are joined with `/`. If the current main term has no sub-list, `Ctrl+Shift+K` does nothing.
+Sub-terms are joined with `/`. If the current main term has no sub-list, `Cmd/Ctrl+Shift+.` does nothing.
 
 ---
 
@@ -219,11 +219,11 @@ Sub-terms are joined with `/`. If the current main term has no sub-list, `Ctrl+S
 |---|---|
 | **Active Profile** | `custom` / `gtd` / `para` |
 | **Prefix** | Short prefix for all property names (default: `my`) |
-| **Property 1 / Terms 1** | Manual property name and comma-separated term list |
-| **Sub-list slots** | Per-term sub-term lists for property 1 |
-| **Property 2 / Terms 2** | Second rotation property |
-| **Main Shortcut** | Default `ctrl+shift+j` |
-| **Sub Shortcut** | Default `ctrl+shift+k` |
+| **Rotation 1 — Property Name / Values** | The block property to change and its comma-separated list of values |
+| **Sub-values** | Optional second-level values for each value of Rotation 1 |
+| **Rotation 2 — Property Name / Values** | A second block property and its values |
+| **Main Shortcut** | Default `mod+shift+,` (Cmd/Ctrl+Shift+<) |
+| **Sub Shortcut** | Default `mod+shift+.` (Cmd/Ctrl+Shift+>) |
 
 ---
 

@@ -33,7 +33,7 @@ Create a page **`Test Property Rotator`**. Create a block and place cursor insid
 
 Block: plain text, no properties.
 
-**`Ctrl+Shift+J`** → adds `my-status:: later`
+**`Cmd/Ctrl+Shift+,`** → adds `my-status:: later`
 
 ---
 
@@ -43,12 +43,12 @@ Set block to `my-status:: later`:
 
 | # | Start | Key | Expected |
 |---|---|---|---|
-| 1 | `my-status:: later` | `Ctrl+Shift+J` | `my-status:: todo` |
-| 2 | `my-status:: todo` | `Ctrl+Shift+J` | `my-status:: now` |
-| 3 | `my-status:: now` | `Ctrl+Shift+J` | `my-status:: doing` |
-| 4 | `my-status:: doing` | `Ctrl+Shift+J` | `my-status:: done` |
-| 5 | `my-status:: done` | `Ctrl+Shift+J` | `my-status:: canceled` |
-| 6 | `my-status:: canceled` | `Ctrl+Shift+J` | `my-status:: later` (wraps) |
+| 1 | `my-status:: later` | `Cmd/Ctrl+Shift+,` | `my-status:: todo` |
+| 2 | `my-status:: todo` | `Cmd/Ctrl+Shift+,` | `my-status:: now` |
+| 3 | `my-status:: now` | `Cmd/Ctrl+Shift+,` | `my-status:: doing` |
+| 4 | `my-status:: doing` | `Cmd/Ctrl+Shift+,` | `my-status:: done` |
+| 5 | `my-status:: done` | `Cmd/Ctrl+Shift+,` | `my-status:: canceled` |
+| 6 | `my-status:: canceled` | `Cmd/Ctrl+Shift+,` | `my-status:: later` (wraps) |
 
 After each rotation the cursor should land right after `::` on that line.
 
@@ -60,10 +60,10 @@ Set block to `my-status:: todo`:
 
 | # | Start | Key | Expected |
 |---|---|---|---|
-| 1 | `my-status:: todo` | `Ctrl+Shift+K` | `my-status:: todo/high` |
-| 2 | `my-status:: todo/high` | `Ctrl+Shift+K` | `my-status:: todo/medium` |
-| 3 | `my-status:: todo/medium` | `Ctrl+Shift+K` | `my-status:: todo/low` |
-| 4 | `my-status:: todo/low` | `Ctrl+Shift+K` | `my-status:: todo/high` (wraps) |
+| 1 | `my-status:: todo` | `Cmd/Ctrl+Shift+.` | `my-status:: todo/high` |
+| 2 | `my-status:: todo/high` | `Cmd/Ctrl+Shift+.` | `my-status:: todo/medium` |
+| 3 | `my-status:: todo/medium` | `Cmd/Ctrl+Shift+.` | `my-status:: todo/low` |
+| 4 | `my-status:: todo/low` | `Cmd/Ctrl+Shift+.` | `my-status:: todo/high` (wraps) |
 
 ---
 
@@ -71,8 +71,8 @@ Set block to `my-status:: todo`:
 
 | Start | Key | Expected |
 |---|---|---|
-| `my-status:: todo/high` | `Ctrl+Shift+J` | `my-status:: now` (sub-term stripped, main advances) |
-| `my-status:: now/blocked` | `Ctrl+Shift+J` | `my-status:: doing` |
+| `my-status:: todo/high` | `Cmd/Ctrl+Shift+,` | `my-status:: now` (sub-term stripped, main advances) |
+| `my-status:: now/blocked` | `Cmd/Ctrl+Shift+,` | `my-status:: doing` |
 
 ---
 
@@ -80,7 +80,7 @@ Set block to `my-status:: todo`:
 
 | Start | Key | Expected |
 |---|---|---|
-| `my-status:: done` | `Ctrl+Shift+K` | No change, no error |
+| `my-status:: done` | `Cmd/Ctrl+Shift+.` | No change, no error |
 
 ---
 
@@ -88,7 +88,7 @@ Set block to `my-status:: todo`:
 
 | Start | Key | Expected |
 |---|---|---|
-| `my-status:: TODO` | `Ctrl+Shift+J` | `my-status:: now` |
+| `my-status:: TODO` | `Cmd/Ctrl+Shift+,` | `my-status:: now` |
 
 ---
 
@@ -101,9 +101,9 @@ my-status:: doing
 my-location:: home
 ```
 
-**Cursor on `my-status` line → `Ctrl+Shift+J`** → only `my-status` rotates to `done`
+**Cursor on `my-status` line → `Cmd/Ctrl+Shift+,`** → only `my-status` rotates to `done`
 
-**Cursor on `my-location` line → `Ctrl+Shift+J`** → only `my-location` rotates to `work`
+**Cursor on `my-location` line → `Cmd/Ctrl+Shift+,`** → only `my-location` rotates to `work`
 
 ---
 
@@ -114,13 +114,13 @@ Open plugin **Settings** → **Property Prefix** field.
 ### 4a. Change prefix to `gtd`
 
 1. Set prefix to `gtd`, close settings
-2. On a new block, press `Ctrl+Shift+J` → adds `gtd-status:: later`
+2. On a new block, press `Cmd/Ctrl+Shift+,` → adds `gtd-status:: later`
 3. Press again → `gtd-status:: todo` (rotates correctly)
 
 ### 4b. Empty prefix falls back to `my`
 
 1. Clear the prefix field, close settings
-2. Press `Ctrl+Shift+J` → property written as `my-status:: later`
+2. Press `Cmd/Ctrl+Shift+,` → property written as `my-status:: later`
 
 ### 4c. Prefix sanitisation
 
@@ -138,13 +138,13 @@ Open plugin **Settings** → **Quick Profile**.
 
 1. Select **gtd** → close settings
 2. Check prefix field shows `gtd` (re-open settings)
-3. Press `Ctrl+Shift+J` on a blank block → `gtd-status:: later`
+3. Press `Cmd/Ctrl+Shift+,` on a blank block → `gtd-status:: later`
 4. Rotate through: `later → todo → now → doing → done → canceled → later`
 
 ### 5b. PARA profile
 
 1. Select **para** → close settings
-2. Press `Ctrl+Shift+J` on a blank block → `para-status:: project`
+2. Press `Cmd/Ctrl+Shift+,` on a blank block → `para-status:: project`
 3. Rotate: `project → area → resource → archive → project`
 
 ### 5c. Back to custom
@@ -161,25 +161,25 @@ Open plugin **Settings**.
 
 ### 6a. Change property name and terms (live, no reload)
 
-1. Set **Property 1 name** to `priority`, **Terms** to `low, medium, high, critical`
+1. Set **Rotation 1 — Property Name** to `priority`, **Rotation 1 — Values** to `low, medium, high, critical`
 2. Close settings
-3. Block: `my-priority:: low` → `Ctrl+Shift+J` → rotates `low → medium → high → critical → low`
+3. Block: `my-priority:: low` → `Cmd/Ctrl+Shift+,` → rotates `low → medium → high → critical → low`
 
 Console should show: `Property Rotator settings updated: {...}`
 
 ### 6b. Per-term sub-lists
 
-1. Reset Property 1: name `status`, terms `todo, doing, done`
-2. Set **Sub-list 1** to `high, medium, low` (maps to term 1 = `todo`)
-3. Set **Sub-list 2** to `progress, blocked, review` (maps to term 2 = `doing`)
-4. On `my-status:: todo` → `Ctrl+Shift+K` → `my-status:: todo/high`
-5. On `my-status:: doing` → `Ctrl+Shift+K` → `my-status:: doing/progress`
+1. Reset Rotation 1: Property Name `status`, Values `todo, doing, done`
+2. Set **Sub-values for "todo"** to `high, medium, low`
+3. Set **Sub-values for "doing"** to `progress, blocked, review`
+4. On `my-status:: todo` → `Cmd/Ctrl+Shift+.` → `my-status:: todo/high`
+5. On `my-status:: doing` → `Cmd/Ctrl+Shift+.` → `my-status:: doing/progress`
 
 ### 6c. Two properties — cursor selects which rotates
 
-1. Set Property 1: `status` (later, todo, now), Property 2: `location` (home, work)
+1. Set Rotation 1: `status` (later, todo, now), Rotation 2: `location` (home, work)
 2. Block with both properties — cursor on `my-location` line
-3. `Ctrl+Shift+J` → only `my-location` rotates
+3. `Cmd/Ctrl+Shift+,` → only `my-location` rotates
 
 ---
 
@@ -187,9 +187,9 @@ Console should show: `Property Rotator settings updated: {...}`
 
 | # | Scenario | Setup | Action | Expected |
 |---|---|---|---|---|
-| 1 | No block focused | Click outside all blocks | `Ctrl+Shift+J` | Error toast: "No current block found" |
-| 2 | Block with unrecognised properties only | `name:: Alice` | `Ctrl+Shift+J` | Adds `my-status:: later` (first configured property) |
-| 3 | Multi-property config, only second present | Config: `type` + `status`; block has only `status:: todo` | `Ctrl+Shift+J` | `type` skipped, `status` rotates |
+| 1 | No block focused | Click outside all blocks | `Cmd/Ctrl+Shift+,` | Error toast: "No current block found" |
+| 2 | Block with unrecognised properties only | `name:: Alice` | `Cmd/Ctrl+Shift+,` | Adds `my-status:: later` (first configured property) |
+| 3 | Multi-property config, only second present | Config: `type` + `status`; block has only `status:: todo` | `Cmd/Ctrl+Shift+,` | `type` skipped, `status` rotates |
 
 ---
 

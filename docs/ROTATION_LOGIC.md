@@ -19,7 +19,7 @@ A **Property Prefix** (2–4 chars) is always applied. It is prepended to every 
 
 **Property 1 — `my-status`:**
 
-| # | Main term | Sub-list (`Ctrl+Shift+K`) |
+| # | Main term | Sub-list (`Cmd/Ctrl+Shift+.`) |
 |---|---|---|
 | 1 | `later` | `scheduled`, `waiting` |
 | 2 | `todo` | `high`, `medium`, `low` |
@@ -84,7 +84,7 @@ The plugin applies this normalisation when reading current values, and writes wi
 
 ---
 
-## Main Rotation (`Ctrl+Shift+J`)
+## Main Rotation (`Cmd/Ctrl+Shift+,`)
 
 ### Step 1 — Select property
 
@@ -110,7 +110,7 @@ Only the matched property is updated. All others are untouched.
 
 ---
 
-## Sub-Rotation (`Ctrl+Shift+K`)
+## Sub-Rotation (`Cmd/Ctrl+Shift+.`)
 
 Adds or cycles a sub-term **alongside** the current main term. The main term is unchanged.
 
@@ -123,7 +123,7 @@ my-status:: todo/medium   →  my-status:: todo/low
 my-status:: todo/low      →  my-status:: todo/high   (wraps)
 ```
 
-If the current main term has no sub-list configured (e.g. `done`), `Ctrl+Shift+K` does **nothing**.
+If the current main term has no sub-list configured (e.g. `done`), `Cmd/Ctrl+Shift+.` does **nothing**.
 
 ---
 
@@ -143,7 +143,7 @@ my-status:: todo, high    ← also parsed correctly
 ## Decision Tree
 
 ```
-Press Ctrl+Shift+J or Ctrl+Shift+K
+Press Cmd/Ctrl+Shift+, or Cmd/Ctrl+Shift+.
 │
 ├─ Block found?
 │   └─ No → show error, stop
@@ -180,8 +180,8 @@ Press Ctrl+Shift+J or Ctrl+Shift+K
 | Property value not in any term list | Set first term |
 | Cursor on unrecognised line | Fall back to first property in config |
 | Both properties present, no cursor hint | First configured property wins |
-| `Ctrl+Shift+K` on term with no sub-list | Do nothing silently |
-| `Ctrl+Shift+J` with sub-term present | Sub-term stripped, main advances |
+| `Cmd/Ctrl+Shift+.` on term with no sub-list | Do nothing silently |
+| `Cmd/Ctrl+Shift+,` with sub-term present | Sub-term stripped, main advances |
 | Profile active | Manual fields ignored, profile terms used |
 
 ---
