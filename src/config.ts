@@ -26,8 +26,8 @@ export const profileGTD: PluginSettings = {
     }
   ],
   shortcuts: {
-    mainShortcut: "ctrl+shift+j",
-    subShortcut: "ctrl+shift+k"
+    mainShortcut: "mod+shift+,",
+    subShortcut: "mod+shift+."
   }
 };
 
@@ -49,8 +49,8 @@ export const profilePARA: PluginSettings = {
     }
   ],
   shortcuts: {
-    mainShortcut: "ctrl+shift+j",
-    subShortcut: "ctrl+shift+k"
+    mainShortcut: "mod+shift+,",
+    subShortcut: "mod+shift+."
   }
 };
 
@@ -82,8 +82,8 @@ export const defaultSettings: PluginSettings = {
     }
   ],
   shortcuts: {
-    mainShortcut: "ctrl+shift+j",
-    subShortcut: "ctrl+shift+k"
+    mainShortcut: "mod+shift+,",
+    subShortcut: "mod+shift+."
   }
 };
 

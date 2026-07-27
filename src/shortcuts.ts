@@ -29,8 +29,8 @@ export function setSettings(settings: PluginSettings): void {
 export function registerShortcuts(settings: PluginSettings = defaultSettings): void {
   currentSettings = settings;
 
-  const mainShortcut = (settings.shortcuts?.mainShortcut || "").trim() || "ctrl+shift+j";
-  const subShortcut = (settings.shortcuts?.subShortcut || "").trim() || "ctrl+shift+k";
+  const mainShortcut = (settings.shortcuts?.mainShortcut || "").trim() || "mod+shift+,";
+  const subShortcut = (settings.shortcuts?.subShortcut || "").trim() || "mod+shift+.";
   console.log("[PR SHORTCUTS] registerShortcuts called - main:", mainShortcut, "sub:", subShortcut);
 
   // mode: "global" uses register-shortcut! (dynamic) — fires even when editor is focused

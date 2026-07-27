@@ -64,11 +64,11 @@ async function main() {
     const savedMain = String(logseq.settings?.mainShortcut ?? "");
     const savedSub = String(logseq.settings?.subShortcut ?? "");
     console.log("[PR INIT] saved shortcuts from settings - main:", savedMain, "sub:", savedSub);
-    const staleValues = ["mod+shift+alt+enter", "mod+shift+enter", "mod+shift+r", "mod+shift+return", "mod+shift+1", "mod+shift+2", "mod+opt+[", "mod+opt+<", "mod+shift+o", "mod+shift+k"];
+    const staleValues = ["mod+shift+alt+enter", "mod+shift+enter", "mod+shift+r", "mod+shift+return", "mod+shift+1", "mod+shift+2", "mod+opt+[", "mod+opt+<", "mod+shift+o", "mod+shift+k", "ctrl+shift+j", "ctrl+shift+k"];
     if (staleValues.includes(savedMain) || staleValues.includes(savedSub)) {
-      console.log("[PR INIT] resetting stale shortcuts");
-      await logseq.updateSettings({ mainShortcut: "ctrl+shift+j", subShortcut: "ctrl+shift+k" });
-      settings.shortcuts = { mainShortcut: "ctrl+shift+j", subShortcut: "ctrl+shift+k" };
+      console.log("[PR INIT] migrating stale/ctrl shortcuts to mod+shift+, / mod+shift+.");
+      await logseq.updateSettings({ mainShortcut: "mod+shift+,", subShortcut: "mod+shift+." });
+      settings.shortcuts = { mainShortcut: "mod+shift+,", subShortcut: "mod+shift+." };
     }
     // Sync UI fields based on active profile or defaults
     const activeProfile = String(logseq.settings?.profile ?? "custom").trim().toLowerCase();
@@ -100,8 +100,8 @@ async function main() {
     console.log("[PR INIT] registerShortcuts done");
 
     // Track current shortcuts to avoid unnecessary re-registration
-    let currentMainShortcut = (settings.shortcuts?.mainShortcut || "").trim() || "ctrl+shift+j";
-    let currentSubShortcut = (settings.shortcuts?.subShortcut || "").trim() || "ctrl+shift+k";
+    let currentMainShortcut = (settings.shortcuts?.mainShortcut || "").trim() || "mod+shift+,";
+    let currentSubShortcut = (settings.shortcuts?.subShortcut || "").trim() || "mod+shift+.";
 
     // Register toolbar button
     registerToolbarButton();
@@ -137,8 +137,8 @@ async function main() {
       setSettings(updated);
 
       // Only re-register shortcuts if they actually changed
-      const newMainShortcut = (updated.shortcuts?.mainShortcut || "").trim() || "ctrl+shift+j";
-      const newSubShortcut = (updated.shortcuts?.subShortcut || "").trim() || "ctrl+shift+k";
+      const newMainShortcut = (updated.shortcuts?.mainShortcut || "").trim() || "mod+shift+,";
+      const newSubShortcut = (updated.shortcuts?.subShortcut || "").trim() || "mod+shift+.";
 
       if (newMainShortcut !== currentMainShortcut || newSubShortcut !== currentSubShortcut) {
         registerShortcuts(updated);

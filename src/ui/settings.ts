@@ -73,17 +73,17 @@ export function registerSettings(): void {
   schema.push({
     key: "mainShortcut",
     type: "string",
-    default: "ctrl+shift+j",
+    default: "mod+shift+,",
     title: "Main Rotation Shortcut",
-    description: "Keyboard shortcut for main property rotation (e.g., ctrl+shift+j)"
+    description: "Keyboard shortcut for main property rotation. Use 'mod' for Cmd on Mac / Ctrl on Windows (e.g., mod+shift+,)"
   });
 
   schema.push({
     key: "subShortcut",
     type: "string",
-    default: "ctrl+shift+k",
+    default: "mod+shift+.",
     title: "Sub-Rotation Shortcut",
-    description: "Keyboard shortcut for sub-rotation (e.g., ctrl+shift+k)"
+    description: "Keyboard shortcut for sub-rotation. Use 'mod' for Cmd on Mac / Ctrl on Windows (e.g., mod+shift+.)"
   });
 
   for (let p = 1; p <= MAX_PROPERTIES; p++) {
@@ -172,8 +172,8 @@ export function buildSettingsFromSchema(raw: any): PluginSettings {
       ...p,
       propertyPrefix,
       shortcuts: {
-        mainShortcut: String(raw.mainShortcut ?? p.shortcuts?.mainShortcut ?? "ctrl+shift+j").trim(),
-        subShortcut: String(raw.subShortcut ?? p.shortcuts?.subShortcut ?? "ctrl+shift+k").trim()
+        mainShortcut: String(raw.mainShortcut ?? p.shortcuts?.mainShortcut ?? "mod+shift+,").trim(),
+        subShortcut: String(raw.subShortcut ?? p.shortcuts?.subShortcut ?? "mod+shift+.").trim()
       }
     };
   }
@@ -206,8 +206,8 @@ export function buildSettingsFromSchema(raw: any): PluginSettings {
 
   // Parse shortcut settings
   const shortcuts = {
-    mainShortcut: String(raw.mainShortcut ?? defaultSettings.shortcuts?.mainShortcut ?? "ctrl+shift+j").trim(),
-    subShortcut: String(raw.subShortcut ?? defaultSettings.shortcuts?.subShortcut ?? "ctrl+shift+k").trim()
+    mainShortcut: String(raw.mainShortcut ?? defaultSettings.shortcuts?.mainShortcut ?? "mod+shift+,").trim(),
+    subShortcut: String(raw.subShortcut ?? defaultSettings.shortcuts?.subShortcut ?? "mod+shift+.").trim()
   };
 
   return { rotations, shortcuts, propertyPrefix };
