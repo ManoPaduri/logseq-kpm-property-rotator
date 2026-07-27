@@ -33,25 +33,23 @@ export function registerShortcuts(settings: PluginSettings = defaultSettings): v
   const subShortcut = (settings.shortcuts?.subShortcut || "").trim() || "ctrl+shift+k";
 
   // Main rotation shortcut
-  logseq.App.registerCommandShortcut(
-    { binding: mainShortcut },
-    async () => { console.log("[Property Rotator] main shortcut triggered"); await handleRotation(false); },
+  logseq.App.registerCommandPalette(
     {
       key: "property-rotator/main",
       label: "Rotate Property",
-      desc: "Rotate the property value to next term"
-    }
+      keybinding: { binding: mainShortcut, mode: "editing" }
+    },
+    async () => { console.log("[Property Rotator] main shortcut triggered"); await handleRotation(false); }
   );
 
   // Sub-rotation shortcut
-  logseq.App.registerCommandShortcut(
-    { binding: subShortcut },
-    async () => { console.log("[Property Rotator] sub shortcut triggered"); await handleRotation(true); },
+  logseq.App.registerCommandPalette(
     {
       key: "property-rotator/sub",
       label: "Sub-Rotate Property",
-      desc: "Rotate the property value using sub-rotation list"
-    }
+      keybinding: { binding: subShortcut, mode: "editing" }
+    },
+    async () => { console.log("[Property Rotator] sub shortcut triggered"); await handleRotation(true); }
   );
 }
 
