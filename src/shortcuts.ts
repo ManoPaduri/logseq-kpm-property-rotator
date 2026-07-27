@@ -37,7 +37,7 @@ export function registerShortcuts(settings: PluginSettings = defaultSettings): v
   // The key insight from cycle-todo-dwim: use checkEditing() to get the block UUID
   logseq.App.registerCommandPalette(
     {
-      key: "property-rotator/main",
+      key: "property-rotator-main",
       label: "Rotate Property",
       keybinding: { binding: mainShortcut, mode: "global" }
     },
@@ -46,7 +46,7 @@ export function registerShortcuts(settings: PluginSettings = defaultSettings): v
 
   logseq.App.registerCommandPalette(
     {
-      key: "property-rotator/sub",
+      key: "property-rotator-sub",
       label: "Sub-Rotate Property",
       keybinding: { binding: subShortcut, mode: "global" }
     },
