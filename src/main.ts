@@ -99,11 +99,14 @@ async function main() {
 
     // Track last synced profile to detect real changes vs. our own updateSettings calls
     let lastSyncedProfile = activeProfile;
-    let isSyncing = false;
+    // Block onSettingsChanged during entire init to prevent re-registration from startup updateSettings calls
+    let isSyncing = true;
+    // Allow settings changes after a short delay so init updateSettings calls are ignored
+    setTimeout(() => { isSyncing = false; }, 2000);
 
     // Apply settings changes live, without requiring a plugin reload
     logseq.onSettingsChanged(async (newSettings: any) => {
-      // Guard against re-entry caused by syncProfileToUI calling updateSettings
+      // Guard against re-entry caused by syncProfileToUI calling updateSettings or init
       if (isSyncing) return;
 
       const newProfile = String(newSettings?.profile ?? "custom").trim().toLowerCase();
