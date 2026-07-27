@@ -104,6 +104,7 @@ async function main() {
       try { if (window.parent?.document) return window.parent.document; } catch { /* blocked */ }
       return document;
     })();
+    console.log("[Property Rotator] keydown target doc:", targetDoc === document ? "plugin-iframe" : "top/parent");
     targetDoc.addEventListener("keydown", async (e: KeyboardEvent) => {
       const main = (settings.shortcuts?.mainShortcut || "").trim() || "ctrl+shift+j";
       const sub = (settings.shortcuts?.subShortcut || "").trim() || "ctrl+shift+k";
@@ -130,10 +131,12 @@ async function main() {
       const matchesSub = subB.ctrl === isCtrl && subB.shift === isShift && subB.meta === isMeta && subB.key === key;
 
       if (matchesMain) {
+        console.log("[Property Rotator] keydown matched main shortcut");
         e.preventDefault();
         e.stopPropagation();
         await handleRotation(false);
       } else if (matchesSub) {
+        console.log("[Property Rotator] keydown matched sub shortcut");
         e.preventDefault();
         e.stopPropagation();
         await handleRotation(true);

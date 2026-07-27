@@ -35,7 +35,7 @@ export function registerShortcuts(settings: PluginSettings = defaultSettings): v
   // Main rotation shortcut
   logseq.App.registerCommandShortcut(
     { binding: mainShortcut },
-    async () => { await handleRotation(false); },
+    async () => { console.log("[Property Rotator] main shortcut triggered"); await handleRotation(false); },
     {
       key: "property-rotator/main",
       label: "Rotate Property",
@@ -46,7 +46,7 @@ export function registerShortcuts(settings: PluginSettings = defaultSettings): v
   // Sub-rotation shortcut
   logseq.App.registerCommandShortcut(
     { binding: subShortcut },
-    async () => { await handleRotation(true); },
+    async () => { console.log("[Property Rotator] sub shortcut triggered"); await handleRotation(true); },
     {
       key: "property-rotator/sub",
       label: "Sub-Rotate Property",
@@ -60,9 +60,12 @@ export function registerShortcuts(settings: PluginSettings = defaultSettings): v
  * @param useSubRotation - Whether to use sub-rotation
  */
 export async function handleRotation(useSubRotation: boolean): Promise<void> {
+  console.log("[Property Rotator] handleRotation called, useSubRotation:", useSubRotation);
   const block = await getCurrentBlock();
+  console.log("[Property Rotator] getCurrentBlock result:", block);
 
   if (!block) {
+    console.log("[Property Rotator] No block found, showing error");
     logseq.UI.showMsg("No current block found", "error");
     return;
   }
