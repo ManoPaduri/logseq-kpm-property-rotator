@@ -91,6 +91,9 @@ After every rotation, the cursor is placed right after `::` on the updated prope
 
 ---
 
+<img width="2130" height="1732" alt="Kapture 2026-07-27 at 02 51 36" src="https://github.com/user-attachments/assets/2ea78e95-2be8-4aa3-b870-dcbb6a313b4f" />
+
+---
 ## Behaviour by Block State
 
 ### 1. No property on block
