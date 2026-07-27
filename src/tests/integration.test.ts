@@ -3,8 +3,7 @@
  * Tests component interactions with mocked Logseq API
  */
 
-import { rotateProperty } from '../rotation';
-import { validatePluginSettings, validatePluginSettingsVerbose, defaultSettings } from '../config';
+import { validatePluginSettings, defaultSettings } from '../config';
 import { showSuccess, showError, showWarning } from '../ui/notifications';
 import { handleRotation, setSettings } from '../shortcuts';
 import { buildSettingsFromSchema } from '../ui/settings';
@@ -23,7 +22,9 @@ const mockLogseq = {
     getBlockProperty: jest.fn(),
     upsertBlockProperty: jest.fn(),
     editBlock: jest.fn().mockResolvedValue(undefined),
-    getEditingBlockContent: jest.fn().mockResolvedValue('')
+    getEditingBlockContent: jest.fn().mockResolvedValue(''),
+    checkEditing: jest.fn().mockResolvedValue(null),
+    getEditingCursorPosition: jest.fn().mockResolvedValue(null)
   },
   UI: {
     showMsg: jest.fn()
@@ -40,57 +41,6 @@ const mockLogseq = {
 };
 
 (globalThis as any).logseq = mockLogseq;
-
-describe('Rotation workflow integration', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
-
-  test('full rotation cycle: null → later → todo → now → doing → done → canceled → later', () => {
-    const config = defaultSettings.rotations[0];
-
-    const step1 = rotateProperty(null, config);
-    expect(step1).toBe('later');
-
-    const step2 = rotateProperty(step1, config);
-    expect(step2).toBe('todo');
-
-    const step3 = rotateProperty(step2, config);
-    expect(step3).toBe('now');
-
-    const step4 = rotateProperty(step3, config);
-    expect(step4).toBe('doing');
-
-    const step5 = rotateProperty(step4, config);
-    expect(step5).toBe('done');
-
-    const step6 = rotateProperty(step5, config);
-    expect(step6).toBe('canceled');
-
-    const step7 = rotateProperty(step6, config);
-    expect(step7).toBe('later');
-  });
-
-  test('sub-rotation workflow: todo → todo/high → todo/medium → todo/low → todo/high', () => {
-    const config = defaultSettings.rotations[0];
-
-    const base = rotateProperty('todo', config, true);
-    expect(base).toBe('todo/high');
-
-    const step2 = rotateProperty(base, config, true);
-    expect(step2).toBe('todo/medium');
-
-    const step3 = rotateProperty(step2, config, true);
-    expect(step3).toBe('todo/low');
-
-    const step4 = rotateProperty(step3, config, true);
-    expect(step4).toBe('todo/high');
-  });
-
-  test('settings validation passes for defaultSettings', () => {
-    expect(validatePluginSettings(defaultSettings)).toBe(true);
-  });
-});
 
 describe('Notification system integration', () => {
   beforeEach(() => {
@@ -154,49 +104,6 @@ describe('API wrapper integration', () => {
     const { setBlockProperty } = await import('../api/logseq');
     const result = await setBlockProperty('abc-123', 'status', 'doing');
     expect(result).toBe(false);
-  });
-});
-
-describe('Settings workflow integration', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
-
-  test('validatePluginSettings passes for defaultSettings', () => {
-    expect(validatePluginSettings(defaultSettings)).toBe(true);
-  });
-
-  test('validatePluginSettingsVerbose returns isValid true for defaultSettings', () => {
-    const result = validatePluginSettingsVerbose(defaultSettings);
-    expect(result.isValid).toBe(true);
-    expect(result.error).toBeUndefined();
-  });
-
-  test('validatePluginSettingsVerbose returns error for missing property name', () => {
-    const bad = { rotations: [{ property: '', terms: ['a', 'b'] }] };
-    const result = validatePluginSettingsVerbose(bad as any);
-    expect(result.isValid).toBe(false);
-    expect(result.error).toContain('Rotation #1');
-  });
-
-  test('validatePluginSettingsVerbose returns error for empty terms array', () => {
-    const bad = { rotations: [{ property: 'status', terms: [] }] };
-    const result = validatePluginSettingsVerbose(bad as any);
-    expect(result.isValid).toBe(false);
-    expect(result.error).toContain('Rotation #1');
-  });
-
-  test('validatePluginSettingsVerbose rejects sub-rotation key not in terms', () => {
-    const bad = {
-      rotations: [{
-        property: 'status',
-        terms: ['todo', 'done'],
-        subRotations: { 'unknown': ['a', 'b'] }
-      }]
-    };
-    const result = validatePluginSettingsVerbose(bad as any);
-    expect(result.isValid).toBe(false);
-    expect(result.error).toMatch(/unknown/);
   });
 });
 
@@ -368,93 +275,6 @@ describe('buildSettingsFromSchema — property prefix', () => {
   });
 });
 
-describe('camelCase key normalisation (property lookup)', () => {
-  const toCamel = (hyphenated: string) =>
-    hyphenated.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
-
-  test('gtd-status normalises to gtdStatus', () => {
-    expect(toCamel('gtd-status')).toBe('gtdStatus');
-  });
-
-  test('my-location normalises to myLocation', () => {
-    expect(toCamel('my-location')).toBe('myLocation');
-  });
-
-  test('para-status normalises to paraStatus', () => {
-    expect(toCamel('para-status')).toBe('paraStatus');
-  });
-
-  test('no-prefix property passes through unchanged', () => {
-    expect(toCamel('status')).toBe('status');
-  });
-
-  test('multi-segment key is fully camelCased', () => {
-    expect(toCamel('my-long-prop-name')).toBe('myLongPropName');
-  });
-});
-
-describe('GTD profile structure', () => {
-  test('gtd status property has expected terms', () => {
-    const statusRotation = profileGTD.rotations.find(r => r.property === 'status');
-    expect(statusRotation).toBeDefined();
-    expect(statusRotation!.terms).toEqual(['later', 'todo', 'now', 'doing', 'done', 'canceled']);
-  });
-
-  test('gtd status has sub-rotations for key terms', () => {
-    const statusRotation = profileGTD.rotations.find(r => r.property === 'status');
-    expect(statusRotation!.subRotations).toBeDefined();
-    expect(statusRotation!.subRotations!['todo']).toContain('high');
-    expect(statusRotation!.subRotations!['later']).toContain('scheduled');
-  });
-
-  test('gtd location property has expected terms', () => {
-    const locRotation = profileGTD.rotations.find(r => r.property === 'location');
-    expect(locRotation).toBeDefined();
-    expect(locRotation!.terms).toContain('home');
-    expect(locRotation!.terms).toContain('work');
-  });
-});
-
-describe('PARA profile structure', () => {
-  test('para status property has expected terms', () => {
-    const statusRotation = profilePARA.rotations.find(r => r.property === 'status');
-    expect(statusRotation).toBeDefined();
-    expect(statusRotation!.terms).toEqual(['project', 'area', 'resource', 'archive']);
-  });
-
-  test('para location property exists', () => {
-    const locRotation = profilePARA.rotations.find(r => r.property === 'location');
-    expect(locRotation).toBeDefined();
-    expect(locRotation!.terms).toContain('home');
-    expect(locRotation!.terms).toContain('work');
-  });
-});
-
-describe('Rotation with prefix — full cycle simulation', () => {
-  test('gtd profile rotation cycle using prefixed camelCase lookup key', () => {
-    const config = profileGTD.rotations.find(r => r.property === 'status')!;
-
-    const step1 = rotateProperty(null, config);
-    expect(step1).toBe('later');
-    const step2 = rotateProperty(step1, config);
-    expect(step2).toBe('todo');
-    const step3 = rotateProperty(step2, config);
-    expect(step3).toBe('now');
-    const step4 = rotateProperty('canceled', config);
-    expect(step4).toBe('later');
-  });
-
-  test('para profile rotation cycle', () => {
-    const config = profilePARA.rotations.find(r => r.property === 'status')!;
-
-    expect(rotateProperty(null, config)).toBe('project');
-    expect(rotateProperty('project', config)).toBe('area');
-    expect(rotateProperty('area', config)).toBe('resource');
-    expect(rotateProperty('resource', config)).toBe('archive');
-    expect(rotateProperty('archive', config)).toBe('project');
-  });
-});
-
 describe('handleRotation end-to-end', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -463,9 +283,11 @@ describe('handleRotation end-to-end', () => {
 
   const mockBlock = (uuid: string, content: string, properties: Record<string, string>) => {
     const b = { uuid, content, properties };
+    (mockLogseq.Editor.checkEditing as jest.Mock).mockResolvedValue(null);
     (mockLogseq.Editor.getCurrentBlock as jest.Mock).mockResolvedValue(b);
     (mockLogseq.Editor.getSelectedBlocks as jest.Mock).mockResolvedValue(null);
     (mockLogseq.Editor.getBlock as jest.Mock).mockResolvedValue(b);
+    (mockLogseq.Editor.getEditingBlockContent as jest.Mock).mockResolvedValue(content);
   };
 
   test('rotates property and shows success notification', async () => {

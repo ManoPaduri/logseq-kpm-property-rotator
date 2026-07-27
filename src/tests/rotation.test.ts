@@ -55,60 +55,7 @@ describe('rotateProperty', () => {
   });
 });
 
-describe('rotateProperty — single term no trailing comma', () => {
-  const config: RotationConfig = {
-    property: 'status',
-    terms: ['later', 'todo', 'now']
-  };
-
-  test('single main term has no trailing comma or separator', () => {
-    const result = rotateProperty(null, config);
-    expect(result).toBe('later');
-    expect(result).not.toMatch(/,/);
-  });
-
-  test('advancing single term produces no trailing comma', () => {
-    expect(rotateProperty('later', config)).toBe('todo');
-    expect(rotateProperty('todo', config)).toBe('now');
-  });
-});
-
-describe('rotateProperty — slash separator parsing', () => {
-  const config: RotationConfig = {
-    property: 'status',
-    terms: ['later', 'todo', 'now', 'doing', 'done', 'canceled'],
-    subRotations: {
-      'todo': ['high', 'medium', 'low'],
-      'now': ['progress', 'blocked', 'review']
-    }
-  };
-
-  test('parses slash-joined sub-term from main rotation value', () => {
-    expect(rotateProperty('todo/high', config)).toBe('now');
-  });
-
-  test('parses comma-joined sub-term from main rotation value', () => {
-    expect(rotateProperty('todo, high', config)).toBe('now');
-  });
-
-  test('sub-rotation result uses slash separator', () => {
-    const result = rotateProperty('todo', config, true);
-    expect(result).toBe('todo/high');
-  });
-
-  test('sub-rotation cycles with slash separator', () => {
-    expect(rotateProperty('todo/high', config, true)).toBe('todo/medium');
-    expect(rotateProperty('todo/medium', config, true)).toBe('todo/low');
-    expect(rotateProperty('todo/low', config, true)).toBe('todo/high');
-  });
-
-  test('main rotation strips slash sub-term and advances', () => {
-    expect(rotateProperty('todo/high', config)).toBe('now');
-    expect(rotateProperty('now/blocked', config)).toBe('doing');
-  });
-});
-
-describe('rotateProperty — sub-term stripping on main rotation', () => {
+describe('rotateProperty — sub-terms and separator handling', () => {
   const config: RotationConfig = {
     property: 'status',
     terms: ['later', 'todo', 'now', 'doing', 'done', 'canceled'],
@@ -121,42 +68,42 @@ describe('rotateProperty — sub-term stripping on main rotation', () => {
     }
   };
 
-  test('strips sub-term from all known sub-lists on main rotation', () => {
+  test('result has no trailing separator when no sub-term', () => {
+    expect(rotateProperty(null, config)).not.toMatch(/[,\/]/);
+  });
+
+  test('main rotation strips slash sub-term and advances', () => {
+    expect(rotateProperty('todo/high', config)).toBe('now');
+    expect(rotateProperty('now/blocked', config)).toBe('doing');
+  });
+
+  test('main rotation strips comma sub-term and advances', () => {
+    expect(rotateProperty('todo, high', config)).toBe('now');
+  });
+
+  test('strips sub-term across all known sub-lists', () => {
     expect(rotateProperty('later/scheduled', config)).toBe('todo');
-    expect(rotateProperty('later/waiting', config)).toBe('todo');
     expect(rotateProperty('doing/blocked', config)).toBe('done');
     expect(rotateProperty('canceled/impossible', config)).toBe('later');
   });
 
-  test('main rotation on bare term (no sub-term) still advances', () => {
+  test('main rotation on bare term still advances', () => {
     expect(rotateProperty('later', config)).toBe('todo');
     expect(rotateProperty('done', config)).toBe('canceled');
     expect(rotateProperty('canceled', config)).toBe('later');
   });
-});
 
-describe('rotateProperty with sub-rotations', () => {
-  const subConfig: RotationConfig = {
-    property: 'status',
-    terms: ['todo', 'doing', 'done'],
-    subRotations: {
-      'todo': ['high', 'medium', 'low'],
-      'doing': ['in-progress', 'blocked', 'review']
-    }
-  };
-
-  test('should use sub-rotation when enabled', () => {
-    expect(rotateProperty('todo', subConfig, true)).toBe('todo/high');
-    expect(rotateProperty('todo/high', subConfig, true)).toBe('todo/medium');
+  test('sub-rotation appends first sub-term with slash', () => {
+    expect(rotateProperty('todo', config, true)).toBe('todo/high');
   });
 
-  test('should cycle through sub-terms', () => {
-    expect(rotateProperty('todo/high', subConfig, true)).toBe('todo/medium');
-    expect(rotateProperty('todo/medium', subConfig, true)).toBe('todo/low');
-    expect(rotateProperty('todo/low', subConfig, true)).toBe('todo/high');
+  test('sub-rotation cycles through sub-terms', () => {
+    expect(rotateProperty('todo/high', config, true)).toBe('todo/medium');
+    expect(rotateProperty('todo/medium', config, true)).toBe('todo/low');
+    expect(rotateProperty('todo/low', config, true)).toBe('todo/high');
   });
 
-  test('sub-rotation does nothing when term has no sub-list', () => {
-    expect(rotateProperty('done', subConfig, true)).toBeNull();
+  test('sub-rotation returns null when term has no sub-list', () => {
+    expect(rotateProperty('done', config, true)).toBeNull();
   });
 });

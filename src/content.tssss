@@ -1,0 +1,86 @@
+/**
+ * Pure helpers for reading/writing `key:: value` properties inside a block's
+ * raw markdown content.
+ *
+ * Rotation writes the FULL block content back via logseq.Editor.updateBlock,
+ * which "gets ahead" of Logseq's editor save process. This prevents the classic
+ * edit-mode clobber bug where upsertBlockProperty changes are overwritten by the
+ * stale editor textarea on blur (values reverting to old).
+ */
+
+function escapeRegExp(s: string): string {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+/**
+ * Read a property value from raw block content.
+ * @returns the trimmed value string, or null if the property line is absent.
+ */
+export function getPropertyFromContent(content: string, property: string): string | null {
+  const re = new RegExp(`^\\s*${escapeRegExp(property)}::\\s*(.*)$`, "i");
+  for (const line of content.split("\n")) {
+    const m = line.match(re);
+    if (m) return m[1].trim();
+  }
+  return null;
+}
+
+/**
+ * Move all configured property lines to the end of the block, in configured
+ * order, regardless of where they currently appear. Lines that are not present
+ * are skipped. All other content is preserved and its order is unchanged.
+ * @param content - Raw block content
+ * @param properties - Property names to sink (e.g. ["gtd-status", "gtd-location"])
+ */
+export function sinkConfiguredProps(content: string, properties: string[]): string {
+  const lines = content.split("\n");
+  const propValues: Map<string, string> = new Map();
+
+  const remaining = lines.filter(line => {
+    for (const prop of properties) {
+      const re = new RegExp(`^\\s*${escapeRegExp(prop)}::\\s*(.*)$`, "i");
+      const m = line.match(re);
+      if (m) {
+        propValues.set(prop.toLowerCase(), `${prop}:: ${m[1].trim()}`);
+        return false; // remove from original position
+      }
+    }
+    return true;
+  });
+
+  // Strip trailing blank lines from remaining before appending props
+  while (remaining.length > 0 && remaining[remaining.length - 1].trim() === "") {
+    remaining.pop();
+  }
+
+  for (const prop of properties) {
+    const line = propValues.get(prop.toLowerCase());
+    if (line !== undefined) remaining.push(line);
+  }
+
+  return remaining.join("\n");
+}
+
+/**
+ * Return new content with `property:: value` set.
+ * Replaces the existing property line (case-insensitive) if present, otherwise
+ * appends it. All other lines are preserved.
+ */
+export function setPropertyInContent(content: string, property: string, value: string): string {
+  const re = new RegExp(`^\\s*${escapeRegExp(property)}::\\s*.*$`, "i");
+  const lines = content.split("\n");
+  let found = false;
+  const out = lines.map(line => {
+    if (re.test(line)) {
+      found = true;
+      return `${property}:: ${value}`;
+    }
+    return line;
+  });
+  if (!found) {
+    // Avoid a leading blank line when the block was empty
+    if (out.length === 1 && out[0].trim() === "") return `${property}:: ${value}`;
+    out.push(`${property}:: ${value}`);
+  }
+  return out.join("\n");
+}
