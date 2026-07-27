@@ -52,7 +52,7 @@ Sub-lists same as default above.
 
 ## Cursor-Aware Property Selection
 
-Before choosing which property to rotate, the plugin detects which property line the cursor is currently on (by reading the active textarea's `selectionStart`).
+Before choosing which property to rotate, the plugin detects which property line the cursor is currently on using `logseq.Editor.getEditingBlockContent()` + `getEditingCursorPosition()`.
 
 ```
 my-status:: doing       ← cursor here → rotates my-status
@@ -64,9 +64,9 @@ my-status:: doing
 my-location:: home      ← cursor here → rotates my-location
 ```
 
-If the cursor is not on a recognised property line, the **first configured property found on the block** is used instead.
+If the cursor is not on a recognised property line, the plugin scans configured properties in order and uses the **first one found on the block**.
 
-After every successful write, the cursor is repositioned right after `::` on the updated line using `logseq.Editor.editBlock({ pos })`.
+After a successful write, the cursor is repositioned right after `::` on the updated property line via `focusPropertyLine()`, which calls `logseq.Editor.editBlock({ pos })`.
 
 ---
 
@@ -106,7 +106,7 @@ my-status:: canceled    →  my-status:: later    (wraps)
 
 ### Step 3 — Write back
 
-Only the matched property is updated. All others are untouched.
+Calls `setBlockProperty()` which uses `logseq.Editor.upsertBlockProperty()`. Only the matched property is updated. All others are untouched.
 
 ---
 
@@ -150,7 +150,7 @@ Press Cmd/Ctrl+Shift+, or Cmd/Ctrl+Shift+.
 │
 ├─ Cursor on a recognised property line?
 │   ├─ Yes → use that property
-│   └─ No  → find first configured property present on block
+│   └─ No  → scan configured properties, use first one found on block
 │
 ├─ Property found on block?
 │   │
@@ -163,7 +163,7 @@ Press Cmd/Ctrl+Shift+, or Cmd/Ctrl+Shift+.
 │   │   ├─ Term has sub-list → add/cycle sub-term, keep main term
 │   │   └─ No sub-list       → do nothing
 │   │
-│   └─ No → add first configured property with first term
+│   └─ No → add ALL configured properties, each with their first term
 │
 └─ On success → reposition cursor after :: on that property line
 ```
@@ -175,7 +175,7 @@ Press Cmd/Ctrl+Shift+, or Cmd/Ctrl+Shift+.
 | Situation | Result |
 |---|---|
 | No block focused | Show error, do nothing |
-| Block has no configured property | Add first property with first term |
+| Block has no configured property | Add **all** configured properties, each with first term |
 | Property value is empty | Set first term |
 | Property value not in any term list | Set first term |
 | Cursor on unrecognised line | Fall back to first property in config |
@@ -186,11 +186,22 @@ Press Cmd/Ctrl+Shift+, or Cmd/Ctrl+Shift+.
 
 ---
 
+## Block Resolution Order
+
+`getCurrentBlock()` tries three methods in order:
+1. `logseq.Editor.checkEditing()` — returns UUID of actively editing block; fetches block + live content via `getEditingBlockContent()`
+2. `logseq.Editor.getCurrentBlock()` — fallback
+3. `logseq.Editor.getSelectedBlocks()[0]` — final fallback
+
+Returns `null` if all three fail.
+
+---
+
 ## Source
 
 - `src/rotation.ts` — `rotateProperty()`, `handleMainRotation()`, `handleSubRotation()`
-- `src/shortcuts.ts` — `handleRotation()`, prefix and camelCase normalisation
+- `src/shortcuts.ts` — `handleRotation()`, `setSettings()`, `registerShortcuts()`
 - `src/config.ts` — `defaultSettings`, `profileGTD`, `profilePARA`, `profiles`
 - `src/ui/settings.ts` — `buildSettingsFromSchema()`, prefix and profile resolution
-- `src/api/logseq.ts` — `getCurrentBlock()`, `setBlockProperty()`, `getCursorProperty()`, `focusPropertyLine()`
-- `src/main.ts` — startup sync, `onSettingsChanged` handler, `syncProfileToUI()`
+- `src/api/logseq.ts` — `getCurrentBlock()`, `getCursorProperty()`, `setBlockProperty()`, `focusPropertyLine()`, `getBlockProperty()`
+- `src/main.ts` — startup, `onSettingsChanged` handler

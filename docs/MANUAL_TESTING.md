@@ -1,6 +1,6 @@
 # Property Rotator Plugin — Manual Testing Guide
 
-**Prerequisites:** Plugin is built (`npm run build:clean`) and loaded in Logseq.
+**Prerequisites:** Plugin is built (`npm run build`) and loaded in Logseq.
 
 ---
 
@@ -8,7 +8,7 @@
 
 ```bash
 cd myplugin/property-rotator
-npm run build:clean
+npm run build
 ```
 
 Then in Logseq:
@@ -49,8 +49,6 @@ Set block to `my-status:: later`:
 | 4 | `my-status:: doing` | `Cmd/Ctrl+Shift+,` | `my-status:: done` |
 | 5 | `my-status:: done` | `Cmd/Ctrl+Shift+,` | `my-status:: canceled` |
 | 6 | `my-status:: canceled` | `Cmd/Ctrl+Shift+,` | `my-status:: later` (wraps) |
-
-After each rotation the cursor should land right after `::` on that line.
 
 ---
 
@@ -198,7 +196,7 @@ Console should show: `Property Rotator settings updated: {...}`
 Open browser console (`Cmd+Option+I`) after each step group:
 - **No red errors** from the Property Rotator plugin
 - Logseq internal yellow warnings are expected and fine
-- You should see structured `[Property Rotator]` log output
+- You should see structured `[PR]` log output
 
 ---
 
@@ -207,9 +205,9 @@ Open browser console (`Cmd+Option+I`) after each step group:
 | Problem | Likely cause | Fix |
 |---|---|---|
 | Shortcut doesn't fire | Keybinding conflict | Check Settings → Keymap, search "property-rotator" |
-| Plugin doesn't appear | `dist/` missing | Run `npm run build:clean` |
+| Plugin doesn't appear | `dist/` missing | Run `npm run build` |
 | Property writes with wrong prefix | Stale settings | Close/re-open settings to confirm prefix value |
-| Property won't rotate after first time | camelCase lookup mismatch | Check console for `Block properties:` log — key should match `prefixStatus` format |
+| Property won't rotate after first time | camelCase lookup mismatch | Check console for `[PR] rotation:` log — `raw` should not be `undefined` |
 | Profile fields don't update visually | Known limitation | Close and re-open settings after switching profile |
 | Settings don't apply | `onSettingsChanged` not firing | Check console for `settings updated`; if absent, reload the plugin |
 
@@ -231,7 +229,6 @@ Open browser console (`Cmd+Option+I`) after each step group:
 | Step 2e: done has no sub-list (does nothing) | ☐ Pass / ☐ Fail | |
 | Step 2f: Case-insensitive match | ☐ Pass / ☐ Fail | |
 | Step 3: Cursor-aware rotation | ☐ Pass / ☐ Fail | |
-| Step 3: Cursor repositions after :: | ☐ Pass / ☐ Fail | |
 | Step 4a: Custom prefix applied | ☐ Pass / ☐ Fail | |
 | Step 4b: Empty prefix falls back to my | ☐ Pass / ☐ Fail | |
 | Step 5a: GTD profile rotation | ☐ Pass / ☐ Fail | |

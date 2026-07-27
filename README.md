@@ -45,15 +45,27 @@ Sub-rotation (`Cmd/Ctrl+Shift+.`) cycles a secondary value alongside the main te
 
 ## Setup
 
+### Option 1 — Logseq Marketplace *(coming soon)*
+
+> ⚠️ Not yet published. Once available: **Logseq → Plugins → Marketplace** → search **Property Rotator** → Install.
+
+### Option 2 — Manual install from GitHub
+
+1. Download the latest release zip from [GitHub Releases](https://github.com/ManoPaduri/logseq-kpm-property-rotator/releases)
+2. Unzip it
+3. In Logseq: **Settings → Advanced → Developer mode → Load unpacked plugin** → select the unzipped folder
+
+### Option 3 — Build from source
+
 ```bash
 git clone https://github.com/ManoPaduri/logseq-kpm-property-rotator.git
 cd logseq-kpm-property-rotator
 npm install && npm run build
 ```
 
-In Logseq: **Settings → Advanced → Developer mode → Load unpacked plugin** → select the folder.
+Then load the folder via **Settings → Advanced → Developer mode → Load unpacked plugin**.
 
-> ⚠️ Not yet in the Logseq marketplace — install manually for now. Bug reports welcome via [GitHub Issues](https://github.com/ManoPaduri/logseq-kpm-property-rotator/issues).
+Bug reports welcome via [GitHub Issues](https://github.com/ManoPaduri/logseq-kpm-property-rotator/issues).
 
 ---
 
