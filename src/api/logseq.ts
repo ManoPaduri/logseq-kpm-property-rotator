@@ -100,11 +100,34 @@ export async function focusPropertyLine(uuid: string, property: string): Promise
  */
 export async function getCurrentBlock(): Promise<BlockInfo | null> {
   try {
-    console.log("[PR API] getCurrentBlock: calling logseq.Editor.getCurrentBlock");
+    // Step 1: checkEditing() — returns UUID of actively editing block (works with global mode shortcuts)
+    // This is the key pattern used by working plugins like cycle-todo-dwim
+    console.log("[PR API] getCurrentBlock: calling logseq.Editor.checkEditing");
+    const editingUuid = await logseq.Editor.checkEditing();
+    console.log("[PR API] getCurrentBlock: checkEditing returned:", editingUuid);
+
+    if (editingUuid && typeof editingUuid === "string") {
+      console.log("[PR API] getCurrentBlock: fetching editing block by uuid:", editingUuid);
+      const editingBlock = await logseq.Editor.getBlock(editingUuid, { includeChildren: false });
+      // Override content with live editing content (ahead of Logseq save process)
+      const liveContent = await logseq.Editor.getEditingBlockContent();
+      console.log("[PR API] getCurrentBlock: editingBlock uuid:", editingBlock?.uuid, "liveContent length:", liveContent?.length ?? 0, "properties:", JSON.stringify(editingBlock?.properties ?? {}));
+      if (editingBlock) {
+        return {
+          uuid: editingBlock.uuid,
+          content: liveContent ?? editingBlock.content ?? '',
+          properties: (editingBlock.properties as Record<string, string>) || {}
+        };
+      }
+    }
+
+    // Step 2: fall back to getCurrentBlock()
+    console.log("[PR API] getCurrentBlock: checkEditing null, trying getCurrentBlock");
     let block = await logseq.Editor.getCurrentBlock();
     console.log("[PR API] getCurrentBlock: getCurrentBlock returned:", block ? block.uuid : null);
 
     if (!block) {
+      // Step 3: fall back to selected blocks
       console.log("[PR API] getCurrentBlock: trying getSelectedBlocks");
       const selected = await logseq.Editor.getSelectedBlocks();
       console.log("[PR API] getCurrentBlock: getSelectedBlocks returned:", selected?.length ?? 0, "blocks");
@@ -114,12 +137,12 @@ export async function getCurrentBlock(): Promise<BlockInfo | null> {
     }
 
     if (!block) {
-      console.log("[PR API] getCurrentBlock: both methods returned null - no block in edit mode");
+      console.log("[PR API] getCurrentBlock: all methods returned null - no block in edit/selected mode");
       return null;
     }
 
     const freshBlock = await logseq.Editor.getBlock(block.uuid, { includeChildren: false });
-    console.log("[PR API] getCurrentBlock: freshBlock content length:", freshBlock?.content?.length ?? 0, "properties:", JSON.stringify(freshBlock?.properties ?? {}));
+    console.log("[PR API] getCurrentBlock: freshBlock uuid:", freshBlock?.uuid, "content length:", freshBlock?.content?.length ?? 0, "properties:", JSON.stringify(freshBlock?.properties ?? {}));
     return {
       uuid: block.uuid,
       content: (freshBlock?.content ?? block.content) ?? '',
