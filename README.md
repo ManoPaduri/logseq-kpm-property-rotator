@@ -45,9 +45,9 @@ Sub-rotation (`Cmd/Ctrl+Shift+.`) cycles a secondary value alongside the main te
 
 ## Setup
 
-### Option 1 — Logseq Marketplace *(coming soon)*
+### Option 1 — Logseq Marketplace 
 
-> ⚠️ Not yet published. Once available: **Logseq → Plugins → Marketplace** → search **Property Rotator** → Install.
+**Logseq → Plugins → Marketplace** → search **Property Rotator** → Install.
 
 ### Option 2 — Manual install from GitHub
 
