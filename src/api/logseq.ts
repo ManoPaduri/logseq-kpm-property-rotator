@@ -14,6 +14,10 @@ export function setLastKnownEditingUuid(uuid: string | null): void {
   _lastEditingUuid = uuid;
 }
 
+export function getLastKnownEditingUuid(): string | null {
+  return _lastEditingUuid;
+}
+
 /**
  * Detect which property name the cursor is currently on.
  * Returns the property name (e.g. "location") if cursor is on a "key:: value" line,

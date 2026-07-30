@@ -6,6 +6,7 @@
 
 import "@logseq/libs";
 import { handleRotation } from '../shortcuts';
+import { getLastKnownEditingUuid } from '../api/logseq';
 
 /**
  * Register toolbar button for the plugin
@@ -33,15 +34,19 @@ export function registerToolbarButton(): void {
   });
 
   // Register click handlers
-  // The 50ms delay lets Logseq's blur/focus cycle from the toolbar click settle
-  // before we rotate and re-enter the block, preventing the alternating edit/non-edit bug.
+  // After 50ms (blur settle), re-enter the block in edit mode BEFORE rotating.
+  // This keeps the editor open through updateBlock's re-render, eliminating the flash.
   logseq.provideModel({
     async rotateProperty() {
       await new Promise(r => setTimeout(r, 50));
+      const uuid = getLastKnownEditingUuid();
+      if (uuid) await logseq.Editor.editBlock(uuid);
       await handleRotation(false);
     },
     async subRotateProperty() {
       await new Promise(r => setTimeout(r, 50));
+      const uuid = getLastKnownEditingUuid();
+      if (uuid) await logseq.Editor.editBlock(uuid);
       await handleRotation(true);
     }
   });
