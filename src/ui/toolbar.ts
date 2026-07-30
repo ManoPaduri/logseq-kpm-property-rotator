@@ -13,7 +13,7 @@ import { handleRotation } from '../shortcuts';
 export function registerToolbarButton(): void {
   logseq.App.registerUIItem("toolbar", {
     key: "property-rotator",
-    template: `<a data-on-click="rotateProperty" title="Rotate Property">🔄</a>`,
+    template: `<a data-on-click="rotateProperty" title="Rotate Property" style="font-size:16px;line-height:1;display:inline-block;">↻</a>`,
   });
 
   // Register the click handler
