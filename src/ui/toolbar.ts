@@ -13,17 +13,36 @@ import { handleRotation } from '../shortcuts';
 export function registerToolbarButton(): void {
   logseq.App.registerUIItem("toolbar", {
     key: "property-rotator",
-    template: `<a class="button" data-on-click="rotateProperty" title="Rotate Property">
+    template: `<a class="button" data-on-click="rotateProperty" title="Rotate Property (main)">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
       </svg></a>`,
   });
 
-  // Register the click handler
+  logseq.App.registerUIItem("toolbar", {
+    key: "property-rotator-sub",
+    template: `<a class="button" data-on-click="subRotateProperty" title="Sub-Rotate Property">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="17 1 21 5 17 9"/>
+        <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
+        <polyline points="7 15 3 19 7 23"/>
+        <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+      </svg></a>`,
+  });
+
+  // Register click handlers
+  // The 50ms delay lets Logseq's blur/focus cycle from the toolbar click settle
+  // before we rotate and re-enter the block, preventing the alternating edit/non-edit bug.
   logseq.provideModel({
     async rotateProperty() {
+      await new Promise(r => setTimeout(r, 50));
       await handleRotation(false);
+    },
+    async subRotateProperty() {
+      await new Promise(r => setTimeout(r, 50));
+      await handleRotation(true);
     }
   });
 }

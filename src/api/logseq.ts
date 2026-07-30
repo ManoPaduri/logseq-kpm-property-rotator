@@ -7,6 +7,13 @@
 import "@logseq/libs";
 import { BlockInfo } from '../types';
 
+/** Last UUID known to be in edit mode — updated by onInputSelectionEnd in main.ts */
+let _lastEditingUuid: string | null = null;
+
+export function setLastKnownEditingUuid(uuid: string | null): void {
+  _lastEditingUuid = uuid;
+}
+
 /**
  * Detect which property name the cursor is currently on.
  * Returns the property name (e.g. "location") if cursor is on a "key:: value" line,
@@ -114,6 +121,18 @@ export async function getCurrentBlock(): Promise<BlockInfo | null> {
     }
 
     if (!block) {
+      // Step 4: fall back to last known editing UUID (covers toolbar click which exits edit mode)
+      if (_lastEditingUuid) {
+        console.log("[PR API] getCurrentBlock: using lastEditingUuid fallback:", _lastEditingUuid);
+        const fallbackBlock = await logseq.Editor.getBlock(_lastEditingUuid, { includeChildren: false });
+        if (fallbackBlock) {
+          return {
+            uuid: fallbackBlock.uuid,
+            content: fallbackBlock.content ?? '',
+            properties: (fallbackBlock.properties as Record<string, string>) || {}
+          };
+        }
+      }
       console.log("[PR API] getCurrentBlock: all methods returned null - no block in edit/selected mode");
       return null;
     }

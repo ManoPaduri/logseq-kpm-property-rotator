@@ -8,6 +8,7 @@ import "@logseq/libs";
 import { PluginSettings } from "./types";
 import { registerShortcuts, setSettings } from "./shortcuts";
 import { registerToolbarButton } from "./ui/toolbar";
+import { setLastKnownEditingUuid } from "./api/logseq";
 import { registerSettings, buildSettingsFromSchema, MAX_SUBLISTS } from "./ui/settings";
 import { defaultSettings, profiles } from "./config";
 
@@ -52,6 +53,9 @@ function loadSettings(): PluginSettings {
 async function main() {
   console.log("[PR INIT] main() started");
   try {
+    // Push notifications 30px lower than Logseq's default top: 3.2em
+    logseq.provideStyle(`.ui__notifications { top: calc(3.2em + 30px) !important; }`);
+
     // Register the structured settings schema (native Logseq settings UI)
     registerSettings();
     console.log("[PR INIT] registerSettings done");
@@ -105,6 +109,12 @@ async function main() {
 
     // Register toolbar button
     registerToolbarButton();
+
+    // Keep last editing UUID fresh so toolbar clicks can still find the block after edit mode exits
+    logseq.Editor.onInputSelectionEnd(async () => {
+      const uuid = await logseq.Editor.checkEditing();
+      setLastKnownEditingUuid(typeof uuid === "string" ? uuid : null);
+    });
 
     // Track last synced profile to detect real changes vs. our own updateSettings calls
     let lastSyncedProfile = activeProfile;
