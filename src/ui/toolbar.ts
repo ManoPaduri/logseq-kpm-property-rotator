@@ -34,17 +34,14 @@ export function registerToolbarButton(): void {
   });
 
   // Register click handlers
-  // After 50ms (blur settle), re-enter the block in edit mode BEFORE rotating.
-  // This keeps the editor open through updateBlock's re-render, eliminating the flash.
+  // Re-enter the block in edit mode before rotating so the editor stays open through updateBlock.
   logseq.provideModel({
     async rotateProperty() {
-      await new Promise(r => setTimeout(r, 50));
       const uuid = getLastKnownEditingUuid();
       if (uuid) await logseq.Editor.editBlock(uuid);
       await handleRotation(false);
     },
     async subRotateProperty() {
-      await new Promise(r => setTimeout(r, 50));
       const uuid = getLastKnownEditingUuid();
       if (uuid) await logseq.Editor.editBlock(uuid);
       await handleRotation(true);
