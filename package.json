@@ -1,6 +1,6 @@
 {
   "name": "logseq-property-rotator",
-  "version": "0.3.5",
+  "version": "0.3.6",
   "description": "Rotate Logseq block properties through configurable term lists with GTD/PARA profiles, prefix support, and cursor-aware rotation.",
   "type": "module",
   "main": "dist/index.html",
